@@ -1,3 +1,55 @@
+# Kereső:
+
+- > Controllers/ArukController.cs 
+
+```bash
+// GET: Aruk
+        public async Task<IActionResult> Index(string Megnevezes, string Beszallito)
+        {
+            var model = new AruKeres();
+            var aruk = _context.Aru.Select(x => x);
+
+            if(!string.IsNullOrEmpty(Megnevezes))
+            {
+                aruk = aruk.Where(x => x.Megnevezes.Contains(Megnevezes));
+                model.Megnevezes = Megnevezes;
+            }
+
+            if(!string.IsNullOrEmpty(Beszallito))
+            {
+
+                aruk = aruk.Where(x => x.Beszallito.Equals(Beszallito));
+                model.Beszallito = Beszallito;
+            }
+
+            model.AruLista = await aruk.OrderBy(x => x.Megnevezes).ToListAsync();
+            model.BeszallitoLista = new SelectList(await _context.Aru.Select(x => x.Beszallito).Distinct().OrderBy(x => x).ToListAsync());
+            
+            return View(model);
+        }
+```
+ - >  Views/Aruk/Index.cshtml
+
+```bash
+<h1>Termék kereső</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-info">Új létrehozása</a>
+</p>
+
+<form asp-controller="Aruk" asp-action="Index" method="get">
+    Megnevezés:
+    <input asp-for="Megnevezes">
+
+   Beszállító:
+    <select asp-for="Beszallito" asp-items="Model.BeszallitoLista">
+        <option value="">Összes</option>
+    </select>
+    <input type="submit" value="Keresés" class="btn btn-success">
+</form>
+
+```
+
 # Validátor
 ```bash
 <script>
